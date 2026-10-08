@@ -5,7 +5,8 @@ import com.univ.lyricsbridge.data.AppSettings;
 public final class OverlayColorPalette {
     public static final int DEFAULT_SUNG_COLOR = AppSettings.DEFAULT_OVERLAY_SUNG_COLOR;
     public static final int DEFAULT_UNSUNG_COLOR = AppSettings.DEFAULT_OVERLAY_UNSUNG_COLOR;
-    public static final int CURRENT_LINE_COLOR = 0xFFFFCD53;
+    public static final int DEFAULT_CURRENT_LINE_COLOR = AppSettings.DEFAULT_OVERLAY_CURRENT_LINE_COLOR;
+    public static final int CURRENT_LINE_COLOR = DEFAULT_CURRENT_LINE_COLOR;
 
     private static final String[] LABELS = {
             "浅灰", "白色", "金黄", "天蓝", "青绿", "绿色", "橙色", "粉色", "紫色", "红色"
@@ -13,7 +14,7 @@ public final class OverlayColorPalette {
     private static final int[] COLORS = {
             DEFAULT_SUNG_COLOR,
             DEFAULT_UNSUNG_COLOR,
-            0xFFFFCD53,
+            DEFAULT_CURRENT_LINE_COLOR,
             0xFF72B7FF,
             0xFF55D6BE,
             0xFF8BD17C,

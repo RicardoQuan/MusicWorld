@@ -54,6 +54,7 @@ public final class LyricsOverlayController {
     private float opacity;
     private int sungColor;
     private int unsungColor;
+    private int currentLineColor;
     private int touchSlop;
     private boolean attached;
     private boolean positionInitialized;
@@ -86,6 +87,7 @@ public final class LyricsOverlayController {
         opacity = AppSettings.getOverlayTextOpacity(context);
         sungColor = AppSettings.getOverlaySungColor(context);
         unsungColor = AppSettings.getOverlayUnsungColor(context);
+        currentLineColor = AppSettings.getOverlayCurrentLineColor(context);
         touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         buildView();
     }
@@ -134,6 +136,7 @@ public final class LyricsOverlayController {
         opacity = AppSettings.getOverlayTextOpacity(context);
         sungColor = AppSettings.getOverlaySungColor(context);
         unsungColor = AppSettings.getOverlayUnsungColor(context);
+        currentLineColor = AppSettings.getOverlayCurrentLineColor(context);
         if (root == null) return;
         currentLyricView.setTextSize(textSizeSp);
         previousLyricView.setTextSize(Math.max(16, textSizeSp - 8));
@@ -363,7 +366,7 @@ public final class LyricsOverlayController {
                 float progress = charEnd <= charStart ? (positionMs >= charEnd ? 1f : 0f)
                         : (positionMs - charStart) / (float) (charEnd - charStart);
                 String glyph = text.substring(offset, next);
-                styled.setSpan(new CharacterProgressSpan(glyph, withOpacity(sungColor),
+                styled.setSpan(new CharacterProgressSpan(glyph, withOpacity(currentLineColor),
                                 withOpacity(unsungColor), progress),
                         offset, next, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
                 offset = next;
@@ -398,7 +401,7 @@ public final class LyricsOverlayController {
 
     private void applyTextOpacity() {
         previousLyricView.setTextColor(withOpacity(sungColor));
-        currentLyricView.setTextColor(withOpacity(OverlayColorPalette.CURRENT_LINE_COLOR));
+        currentLyricView.setTextColor(withOpacity(currentLineColor));
         nextLyricView.setTextColor(withOpacity(unsungColor));
         metadataView.setTextColor(withOpacity(Color.rgb(205, 214, 222)));
         int shadowColor = Color.argb(Math.round(opacity * 96), 0, 0, 0);

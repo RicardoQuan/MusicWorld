@@ -61,6 +61,7 @@ public final class CarModeActivity extends Activity {
     private TextView opacityValue;
     private Button sungColorButton;
     private Button unsungColorButton;
+    private Button currentLineColorButton;
     private String selectedAddress = "";
     private String lastAutoConnectAddress = "";
     private String pendingBluetoothEnableAddress = "";
@@ -259,11 +260,14 @@ public final class CarModeActivity extends Activity {
         });
         add(settingsCard, opacityBar, dp(2));
 
-        TextView colorHint = text("当前正在唱的句子保持金色", 12, MUTED);
+        TextView colorHint = text("逐字歌词中已唱字使用当前行颜色，未唱字可单独设置", 12, MUTED);
         add(settingsCard, colorHint, dp(7));
-        sungColorButton = colorChoiceButton("已唱（上一句）", AppSettings.getOverlaySungColor(this), true);
+        currentLineColorButton = colorChoiceButton("当前行",
+                AppSettings.getOverlayCurrentLineColor(this), ColorTarget.CURRENT_LINE);
+        add(settingsCard, currentLineColorButton, dp(4));
+        sungColorButton = colorChoiceButton("已唱（上一句）", AppSettings.getOverlaySungColor(this), ColorTarget.SUNG);
         add(settingsCard, sungColorButton, dp(4));
-        unsungColorButton = colorChoiceButton("未唱（下一句）", AppSettings.getOverlayUnsungColor(this), false);
+        unsungColorButton = colorChoiceButton("未唱（下一句）", AppSettings.getOverlayUnsungColor(this), ColorTarget.UNSUNG);
         add(settingsCard, unsungColorButton, dp(4));
 
         Button resetPositionButton = button("复位歌词位置（屏幕居中）", Color.rgb(51, 68, 79), this::resetOverlayPosition);
@@ -639,32 +643,57 @@ public final class CarModeActivity extends Activity {
         return button;
     }
 
-    private Button colorChoiceButton(String label, int color, boolean sung) {
-        Button choice = button("", color, () -> showColorPicker(label, sung));
+    private Button colorChoiceButton(String label, int color, ColorTarget target) {
+        Button choice = button("", color, () -> showColorPicker(label, target));
         updateColorChoiceButton(choice, label, color);
         return choice;
     }
 
-    private void showColorPicker(String label, boolean sung) {
-        int selectedColor = sung ? AppSettings.getOverlaySungColor(this)
-                : AppSettings.getOverlayUnsungColor(this);
+    private void showColorPicker(String label, ColorTarget target) {
+        int selectedColor;
+        switch (target) {
+            case SUNG:
+                selectedColor = AppSettings.getOverlaySungColor(this);
+                break;
+            case UNSUNG:
+                selectedColor = AppSettings.getOverlayUnsungColor(this);
+                break;
+            case CURRENT_LINE:
+                selectedColor = AppSettings.getOverlayCurrentLineColor(this);
+                break;
+            default:
+                throw new IllegalStateException("Unknown color target: " + target);
+        }
         int selectedIndex = OverlayColorPalette.indexOfColor(selectedColor);
         new AlertDialog.Builder(this)
                 .setTitle("选择" + label + "颜色")
                 .setSingleChoiceItems(OverlayColorPalette.labels(), selectedIndex, (dialog, which) -> {
                     int color = OverlayColorPalette.colorAt(which);
-                    if (sung) {
-                        AppSettings.setOverlaySungColor(this, color);
-                        updateColorChoiceButton(sungColorButton, "已唱（上一句）", color);
-                    } else {
-                        AppSettings.setOverlayUnsungColor(this, color);
-                        updateColorChoiceButton(unsungColorButton, "未唱（下一句）", color);
+                    switch (target) {
+                        case SUNG:
+                            AppSettings.setOverlaySungColor(this, color);
+                            updateColorChoiceButton(sungColorButton, "已唱（上一句）", color);
+                            break;
+                        case UNSUNG:
+                            AppSettings.setOverlayUnsungColor(this, color);
+                            updateColorChoiceButton(unsungColorButton, "未唱（下一句）", color);
+                            break;
+                        case CURRENT_LINE:
+                            AppSettings.setOverlayCurrentLineColor(this, color);
+                            updateColorChoiceButton(currentLineColorButton, "当前行", color);
+                            break;
                     }
                     refreshVisibleOverlay();
                     dialog.dismiss();
                 })
                 .setNegativeButton("取消", null)
                 .show();
+    }
+
+    private enum ColorTarget {
+        SUNG,
+        UNSUNG,
+        CURRENT_LINE
     }
 
     private void updateColorChoiceButton(Button button, String label, int color) {

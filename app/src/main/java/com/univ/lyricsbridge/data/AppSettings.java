@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 public final class AppSettings {
     public static final int DEFAULT_OVERLAY_SUNG_COLOR = 0xFFADB8C2;
     public static final int DEFAULT_OVERLAY_UNSUNG_COLOR = 0xFFFFFFFF;
+    public static final int DEFAULT_OVERLAY_CURRENT_LINE_COLOR = 0xFFFFCD53;
     private static final String PREFS = "lyrics_bridge";
     private static final String ROLE = "role";
     private static final String PAIRED_DEVICE_ADDRESS = "paired_device_address";
@@ -14,6 +15,7 @@ public final class AppSettings {
     private static final String OVERLAY_OPACITY = "overlay_opacity";
     private static final String OVERLAY_SUNG_COLOR = "overlay_sung_color";
     private static final String OVERLAY_UNSUNG_COLOR = "overlay_unsung_color";
+    private static final String OVERLAY_CURRENT_LINE_COLOR = "overlay_current_line_color";
     private static final String OVERLAY_SCROLL_DURATION = "overlay_scroll_duration";
     private static final String OVERLAY_X = "overlay_x";
     private static final String OVERLAY_Y = "overlay_y";
@@ -85,6 +87,15 @@ public final class AppSettings {
 
     public static void setOverlayUnsungColor(Context context, int color) {
         preferences(context).edit().putInt(OVERLAY_UNSUNG_COLOR, color).apply();
+    }
+
+    public static int getOverlayCurrentLineColor(Context context) {
+        return preferences(context).getInt(
+                OVERLAY_CURRENT_LINE_COLOR, DEFAULT_OVERLAY_CURRENT_LINE_COLOR);
+    }
+
+    public static void setOverlayCurrentLineColor(Context context, int color) {
+        preferences(context).edit().putInt(OVERLAY_CURRENT_LINE_COLOR, color).apply();
     }
 
     public static int getOverlayScrollDuration(Context context) {

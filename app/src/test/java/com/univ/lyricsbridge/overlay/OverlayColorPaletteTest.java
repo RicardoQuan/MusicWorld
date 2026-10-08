@@ -7,6 +7,13 @@ import org.junit.Test;
 
 public final class OverlayColorPaletteTest {
     @Test
+    public void currentLineDefaultIsGoldAndSelectable() {
+        assertEquals(0xFFFFCD53, OverlayColorPalette.DEFAULT_CURRENT_LINE_COLOR);
+        assertTrue(OverlayColorPalette.indexOfColor(
+                OverlayColorPalette.DEFAULT_CURRENT_LINE_COLOR) >= 0);
+    }
+
+    @Test
     public void defaultsAreSelectableAndPaletteArraysAreDefensiveCopies() {
         assertTrue(OverlayColorPalette.indexOfColor(OverlayColorPalette.DEFAULT_SUNG_COLOR) >= 0);
         assertTrue(OverlayColorPalette.indexOfColor(OverlayColorPalette.DEFAULT_UNSUNG_COLOR) >= 0);
