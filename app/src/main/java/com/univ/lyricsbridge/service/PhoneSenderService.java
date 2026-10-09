@@ -24,6 +24,7 @@ import com.univ.lyricsbridge.lyric.LyricLookupEngine;
 import com.univ.lyricsbridge.lyric.LyricLookupResult;
 import com.univ.lyricsbridge.lyric.LyricProvider;
 import com.univ.lyricsbridge.media.MediaStateStore;
+import com.univ.lyricsbridge.media.LyricsNotificationListenerService;
 import com.univ.lyricsbridge.model.TrackInfo;
 import com.univ.lyricsbridge.model.PlaybackSnapshot;
 import com.univ.lyricsbridge.sync.PlaybackSyncEngine;
@@ -41,6 +42,14 @@ public final class PhoneSenderService extends Service implements MediaStateStore
     private static final String NOTIFICATION_TITLE = "歌词桥手机发送端";
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService lyricWorker = Executors.newSingleThreadExecutor();
+    private final Runnable listenerRecoveryTicker = new Runnable() {
+        @Override
+        public void run() {
+            if (!active) return;
+            LyricsNotificationListenerService.ensureListenerConnected(PhoneSenderService.this);
+            mainHandler.postDelayed(this, 5000);
+        }
+    };
     private final Runnable playbackTicker = new Runnable() {
         @Override
         public void run() {
@@ -120,6 +129,7 @@ public final class PhoneSenderService extends Service implements MediaStateStore
         server.start();
         recoverBluetoothIfNeeded();
         mainHandler.post(playbackTicker);
+        mainHandler.post(listenerRecoveryTicker);
     }
 
     private void registerBluetoothStateReceiver() {
@@ -334,6 +344,7 @@ public final class PhoneSenderService extends Service implements MediaStateStore
         notificationStarted = false;
         MediaStateStore.removeListener(this);
         mainHandler.removeCallbacks(playbackTicker);
+        mainHandler.removeCallbacks(listenerRecoveryTicker);
         if (bluetoothReceiverRegistered) {
             try {
                 unregisterReceiver(bluetoothStateReceiver);

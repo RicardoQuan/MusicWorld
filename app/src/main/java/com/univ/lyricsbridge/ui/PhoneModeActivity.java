@@ -258,6 +258,7 @@ public final class PhoneModeActivity extends Activity {
     protected void onResume() {
         super.onResume();
         if (netEaseLoginWebView != null) netEaseLoginWebView.onResume();
+        LyricsNotificationListenerService.ensureListenerConnected(this);
         updatePermissionStatus();
         refreshServiceStatus();
         maybeAutoStartSender();
@@ -1071,7 +1072,7 @@ public final class PhoneModeActivity extends Activity {
             permissionStatus.setText("媒体读取授权：未开启。请在系统设置中允许“歌词桥”读取通知。");
             permissionStatus.setTextColor(Color.rgb(255, 210, 120));
         } else if (!connected) {
-            permissionStatus.setText("媒体读取授权：已开启；监听服务尚未连接。请重新开关通知使用权后返回本页。");
+            permissionStatus.setText("媒体读取授权：已开启；正在自动恢复监听连接，无需重复授权。");
             permissionStatus.setTextColor(Color.rgb(255, 210, 120));
         } else {
             permissionStatus.setText("媒体读取授权：已开启，监听服务已连接。请在网易云实际播放歌曲。");
@@ -1168,7 +1169,7 @@ public final class PhoneModeActivity extends Activity {
             String nextStep = !permissionGranted
                     ? "请先开启通知使用权。"
                     : (!LyricsNotificationListenerService.isListenerConnected()
-                    ? "监听服务未连接，请重新开关通知使用权。"
+                    ? "正在自动恢复监听连接，请稍候。"
                     : (diagnostic.contains("未匹配网易云包名")
                     ? "系统看到了其他媒体会话，请确认正在使用网易云官方 App。"
                     : (diagnostic.contains("拒绝") || diagnostic.contains("未允许")

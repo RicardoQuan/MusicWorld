@@ -66,12 +66,12 @@ $env:ANDROID_HOME = 'C:\path\to\android-sdk'
 $env:ANDROID_SDK_ROOT = $env:ANDROID_HOME
 subst U: 'D:\codex\02_软件开发'
 Set-Location U:\
-.\gradlew.bat --no-daemon --console=plain testDebugUnitTest assembleDebug
+.\gradlew.bat --no-daemon --no-build-cache --console=plain clean testDebugUnitTest assembleDebug
 Set-Location D:\codex\02_软件开发
 subst U: /D
 ```
 
-构建输出位于 `app\build\outputs\apk\debug\app-debug.apk`。复制到 `dist\univ-lyrics-bridge-debug.apk` 后即可手动分发。若盘符 `U:` 已被占用，请换一个空闲盘符。
+构建输出位于 `app\build\outputs\apk\debug\app-debug.apk`。分发前使用上述清理构建，避免增量合并残留旧 DEX 导致 `NoSuchMethodError`；仅检查 Java 编译或 APK 签名无法发现这种错误。复制到 `dist\univ-lyrics-bridge-debug.apk` 后即可手动分发。若盘符 `U:` 已被占用，请换一个空闲盘符。
 
 ## 停止与卸载
 
